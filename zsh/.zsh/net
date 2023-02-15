@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+import os
+import sys
+import time
+
+def iface_data(ifname):
+    with open('/proc/net/dev')as fp:
+        for line in fp.readlines():
+            if line.startswith(ifname):
+                return line
+
+
+def get_info(ifname):
+    cul = iface_data(ifname).split()
+    recv = cul[1]
+    send = cul[9]
+    return int(recv.strip()), int(send.strip())
+
+def byte2(bytes):
+    a = ['MB', 'KB', '']
+    strs = ''
+    x = 0
+    while True:
+        x += 1
+        tmp = bytes % 1024
+        bytes = bytes // 1024
+        if bytes < 1:
+            break
+        strs += tmp+a[a.__len__()-x-1]
+    return strs
+
+def byte2(bytes):
+    a = ['TB', 'GB','MB', 'KB', 'b']
+    strs = ''
+    x = 0
+    while True:
+        x += 1
+        tmp = bytes % 1024
+        bytes = bytes // 1024
+        strs = tmp.__str__() + a[a.__len__()-x] +'  '+ strs
+        if bytes < 1:
+            break
+    return strs
+
+
+def show():
+    while True:
+        c, l = os.get_terminal_size()
+        recv1, send1 = get_info(sys.argv[1])
+        time.sleep(1)
+        recv, send = get_info(sys.argv[1])
+        recv, send = ''.join(byte2(recv - recv1).split()[:2]), ''.join(byte2(send - send1).split()[:2])
+        print('\033[{}D\033[K\033[32m\u2193:{} ,\u2191: {}\033[0m'.format(c,recv, send), end='')
+        sys.stdout.flush()
+try:    
+    show()
+except KeyboardInterrupt:
+    pass

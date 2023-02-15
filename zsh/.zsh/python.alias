@@ -1,0 +1,23 @@
+#!/bin/sh
+alias convert_time="python3 -c \"
+import time
+import sys
+if sys.argv.__len__() < 2 or sys.argv.__len__() >= 3:
+    print('Usage:\n\targuments must be \'1990-03-02 08:10:12,111\' or 637901400.125')
+    sys.exit(1)
+arg = sys.argv[1]
+try:
+    if '.' in arg and arg.replace('.', '').isdigit():
+        s, ms = arg.split('.')
+        print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(int(s))),'.',ms)
+    if '-' in arg and ':' in arg:
+        s = arg
+        ms = '0'
+        if ',' in arg:
+            s, ms = arg.split(',')
+        print(time.mktime(time.strptime(s, '%Y-%m-%d %H:%M:%S')) + float(ms)/1000)
+except Exception as err:
+    print(err)
+    print('Usage:\n\targuments must be \'1990-03-02 08:10:12,111\' or 637901400.125')
+\""
+
